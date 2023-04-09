@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Club Membership Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-container {
+            width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-container label, .form-container input, .form-container button {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 5px;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .form-container button[type="submit"] {
+            background-color: #28a745;
+        }
+
+        #member-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        #member-table th, #member-table td {
+            padding: 8px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Function to handle form submission
+        function submitForm() {
+            var name = $('#name').val();
+            var email = $('#email').val();
+            var age = $('#age').val();
+            // Make AJAX request to server
+            $.ajax({
+                type: "POST",
+                url: "/submitForm",
+                data: JSON.stringify({
+                    name: name,
+                    email: email,
+                    age: age
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    alert('Congratulations! You are now a member.');
+                },
+                error: function() {
+                    alert('Failed to submit form data. Please try again later.');
+                }
+            });
+        }
+
+        // Function to handle "See Members" button click
+        function seeMembers() {
+            // Make AJAX request to server
+            $.ajax({
+                type: "GET",
+                url: "/getAll",
+                dataType: "json",
+                success: function(response) {
+                    var memberTable = $('#member-table-body');
+                    memberTable.empty(); // Clear existing table data
+                    response.status.forEach(function(member) {
+                        var row = $('<tr></tr>');
+                        row.append($('<td></td>').text(member.name));
+                        row.append($('<td></td>').text(member.email));
+                        row.append($('<td></td>').text(member.age));
+                        memberTable.append(row);
+                    });
+                },
+                error: function() {
+                    alert('Failed to fetch member data. Please try again later.');
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Club Membership Form</h1>
+    <div class="form-container">
+        <form method="post" action="/submitForm">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name">
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email">
+
+            <label for="age">Age</label>
+            <input type="number" id="age" name="age">
+
+            <button type="button" id="b">Submit</button>
+        </form>
+    </div>
+        <h2>Club Members (Newest Member First)</h2>
+    <table id="member-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody id="member-table-body">
+            <!-- Member data will be populated dynamically using AJAX -->
+        </tbody>
+    </table>
+    <!-- Script for AJAX requests -->
+    <script>
+        // Function to handle form submission
+         $(document).ready(function() {
+                seeMembers();
+              $("#b").on("click", function() {
+                var name = $("#name").val();
+                var email = $("#email").val();
+                var age = $("#age").val();
+
+                var formData = {
+                  name: name,
+                  email: email,
+                  age: age,
+                };
+
+                $.ajax({
+                  url: "/submitForm",
+                  type: "POST",
+                  data: formData,
+                  success: function(response) {
+                    console.log(response);
+
+                    $('#name').val('');
+                    $('#email').val('');
+                    $('#age').val('');
+
+
+
+
+                    alert("Congratulations! You are now a member!");
+                    seeMembers();
+
+                  },
+                  error: function(xhr, status, error) {
+                    console.error(error);
+                  }
+                });
+              });
+            });
+
+
+        // Function to handle "See Members" button click
+        function seeMembers() {
+            // Make AJAX request to server
+            $.ajax({
+                type: "GET",
+                url: "/getAll",
+                dataType: "json",
+                success: function(response) {
+                    var memberTable = $('#member-table-body');
+                    memberTable.empty(); // Clear existing table data
+                    response.status.forEach(function(member) {
+                        var row = $('<tr></tr>');
+                        row.append($('<td></td>').text(member.name));
+                        row.append($('<td></td>').text(member.email));
+                        row.append($('<td></td>').text(member.age));
+                        memberTable.append(row);
+                    });
+                },
+                error: function() {
+                    alert('Failed to fetch member data. Please try again later.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
